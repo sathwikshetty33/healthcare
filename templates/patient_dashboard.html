@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Dashboard - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            {% if patient.profile_picture %}
+                                <img src="{{ patient.profile_picture.url }}" alt="Profile" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user fa-2x text-primary"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <h2 class="mb-1">Welcome, {{ user.get_full_name|default:user.username }}!</h2>
+                            <p class="mb-0">
+                                <i class="fas fa-envelope"></i> {{ user.email }}
+                                {% if patient.address %}
+                                    <br><i class="fas fa-map-marker-alt"></i> 
+                                    {{ patient.address.line1 }}, {{ patient.address.city }}, {{ patient.address.state }} - {{ patient.address.pincode }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card dashboard-card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+                    <h4>{{ stats.total_appointments }}</h4>
+                    <p class="mb-0">Total Appointments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h4>{{ stats.upcoming_appointments }}</h4>
+                    <p class="mb-0">Upcoming</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-prescription-bottle-alt fa-2x mb-2"></i>
+                    <h4>{{ stats.total_prescriptions }}</h4>
+                    <p class="mb-0">Total Prescriptions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card bg-danger text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-pills fa-2x mb-2"></i>
+                    <h4>{{ stats.active_prescriptions }}</h4>
+                    <p class="mb-0">Active Prescriptions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Recent Appointments -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Recent Appointments</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_appointments %}
+                        {% for appointment in recent_appointments %}
+                            <div class="border-bottom pb-2 mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ appointment.doctor_name }}</strong>
+                                    <span class="badge bg-{{ appointment.status|lower == 'confirmed' and 'success' or 'warning' }}">
+                                        {{ appointment.status }}
+                                    </span>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> {{ appointment.date }} at {{ appointment.time }}
+                                    <br><i class="fas fa-stethoscope"></i> {{ appointment.type }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent appointments</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Medical Records -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-file-medical"></i> Medical Records</h5>
+                </div>
+                <div class="card-body">
+                    {% if medical_records %}
+                        {% for record in medical_records %}
+                            <div class="border-bottom pb-2 mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ record.doctor }}</strong>
+                                    <small class="text-muted">{{ record.date }}</small>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-diagnosis"></i> {{ record.diagnosis }}
+                                    <br><i class="fas fa-prescription"></i> {{ record.prescription }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No medical records available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Prescriptions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-pills"></i> Active Prescriptions</h5>
+                </div>
+                <div class="card-body">
+                    {% if prescriptions %}
+                        <div class="row">
+                            {% for prescription in prescriptions %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card border-left-primary">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ prescription.medicine }}</h6>
+                                            <p class="card-text">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock"></i> {{ prescription.dosage }}
+                                                    <br><i class="fas fa-user-md"></i> {{ prescription.prescribed_by }}
+                                                    <br><i class="fas fa-calendar"></i> {{ prescription.date }}
+                                                </small>
+                                            </p>
+                                            <span class="badge bg-success">{{ prescription.status }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No active prescriptions</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            {% if doctor.profile_picture %}
+                                <img src="{{ doctor.profile_picture.url }}" alt="Profile" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user-md fa-2x text-success"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <h2 class="mb-1">Dr. {{ user.get_full_name|default:user.username }}</h2>
+                            <p class="mb-0">
+                                <i class="fas fa-envelope"></i> {{ user.email }}
+                                {% if doctor.address %}
+                                    <br><i class="fas fa-map-marker-alt"></i> 
+                                    {{ doctor.address.line1 }}, {{ doctor.address.city }}, {{ doctor.address.state }} - {{ doctor.address.pincode }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card dashboard-card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-day fa-2x mb-2"></i>
+                    <h4>{{ stats.today_appointments }}</h4>
+                    <p class="mb-0">Today's Appointments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h4>{{ stats.total_patients }}</h4>
+                    <p class="mb-0">Total Patients</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-list fa-2x mb-2"></i>
+                    <h4>{{ stats.pending_reviews }}</h4>
+                    <p class="mb-0">Pending Reviews</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h4>{{ stats.completed_today }}</h4>
+                    <p class="mb-0">Completed Today</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Today's Appointments -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-day"></i> Today's Appointments</h5>
+                </div>
+                <div class="card-body">
+                    {% if today_appointments %}
+                        {% for appointment in today_appointments %}
+                            <div class="border-bottom pb-2 mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ appointment.patient_name }}</strong>
+                                    <span class="badge {% if appointment.status|lower == 'confirmed' %}bg-success{% else %}bg-warning{% endif %}">
+                                        {{ appointment.status }}
+                                    </span>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i> {{ appointment.time }}
+                                    <br><i class="fas fa-stethoscope"></i> {{ appointment.type }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No appointments scheduled for today</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Patients -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Recent Patients</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_patients %}
+                        {% for patient in recent_patients %}
+                            <div class="border-bottom pb-2 mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ patient.name }}</strong>
+                                    <small class="text-muted">{{ patient.last_visit }}</small>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-heartbeat"></i> {{ patient.condition }}
+                                    <br><span class="badge {% if patient.status|lower == 'stable' %}bg-success{% elif patient.status|lower == 'healthy' %}bg-primary{% else %}bg-warning{% endif %}">
+                                        {{ patient.status }}
+                                    </span>
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent patients</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Row -->
+    <div class="row">
+        <!-- Pending Prescriptions -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-prescription-bottle-alt"></i> Pending Prescriptions</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_prescriptions %}
+                        {% for prescription in pending_prescriptions %}
+                            <div class="border-bottom pb-2 mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ prescription.patient }}</strong>
+                                    <small class="text-muted">{{ prescription.date }}</small>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-pills"></i> {{ prescription.medicine }}
+                                    <br><span class="badge {% if prescription.status|lower == 'active' %}bg-success{% else %}bg-warning{% endif %}">
+                                        {{ prescription.status }}
+                                    </span>
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No pending prescriptions</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-plus"></i> Upcoming Appointments</h5>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_appointments %}
+                        {% for appointment in upcoming_appointments %}
+                            <div class="border-bottom pb-2 mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ appointment.patient_name }}</strong>
+                                    <small class="text-muted">{{ appointment.date }}</small>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i> {{ appointment.time }}
+                                    <br><i class="fas fa-stethoscope"></i> {{ appointment.type }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No upcoming appointments</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
