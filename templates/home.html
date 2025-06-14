@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 mb-4">
+            <i class="fas fa-heartbeat"></i> Healthcare Management System
+        </h1>
+        <p class="lead mb-5">Connecting patients and doctors for better healthcare</p>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card bg-white text-dark h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-injured fa-3x text-primary mb-3"></i>
+                                <h4>For Patients</h4>
+                                <p>Book appointments, manage your health records, and connect with doctors.</p>
+                                <div class="mt-3">
+                                    <a href="{% url 'patient_login' %}" class="btn btn-primary me-2">Login</a>
+                                    <a href="{% url 'patient_signup' %}" class="btn btn-outline-primary">Sign Up</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card bg-white text-dark h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-md fa-3x text-success mb-3"></i>
+                                <h4>For Doctors</h4>
+                                <p>Manage patient appointments, medical records, and provide quality care.</p>
+                                <div class="mt-3">
+                                    <a href="{% url 'doctor_login' %}" class="btn btn-success me-2">Login</a>
+                                    <a href="{% url 'doctor_signup' %}" class="btn btn-outline-success">Sign Up</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
