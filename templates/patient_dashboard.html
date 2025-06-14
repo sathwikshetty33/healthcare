@@ -89,7 +89,7 @@
                             <div class="border-bottom pb-2 mb-2">
                                 <div class="d-flex justify-content-between">
                                     <strong>{{ appointment.doctor_name }}</strong>
-                                    <span class="badge bg-{{ appointment.status|lower == 'confirmed' and 'success' or 'warning' }}">
+                                    <span class="badge {% if appointment.status|lower == 'confirmed' %}bg-success{% else %}bg-warning{% endif %}">
                                         {{ appointment.status }}
                                     </span>
                                 </div>
